@@ -23,6 +23,12 @@ jobs:
 
       - name: Build and Push Backend Image
         run: |
-          docker build -t backend:latest .
+          docker build \
+            --build-arg PORT=${{ secrets.PORT }} \
+            --build-arg JWT_SECRET=${{ secrets.JWT_SECRET }} \
+            --build-arg GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} \
+            --build-arg AWS_HOSTED_ZONE_ID=${{ secrets.AWS_HOSTED_ZONE_ID }} \
+            -t backend:latest .
+
           docker tag backend:latest ${{ secrets.GAR_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/${{ secrets.GAR_REPO }}/backend:latest
           docker push ${{ secrets.GAR_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/${{ secrets.GAR_REPO }}/backend:latest

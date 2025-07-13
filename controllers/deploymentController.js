@@ -3,6 +3,7 @@ const provisionCluster = require('../stages/stage2ProvisionCluster');
 const stage3SetupJumpbox = require('../stages/stage3SetupJumpbox')
 const stage1CloneRepo = require('../stages/stage1CloneRepo');
 const { DEV_LOCAL_REPO_DIR } = require('../config/constants');
+const stage4DomainMapping = require('../stages/stage4MapDomain');
 
 const startDeployment = async (req, res) => {
   const formData = req.body;
@@ -18,13 +19,17 @@ const startDeployment = async (req, res) => {
 
     // Stage 2
     console.log('Stage 2: Provisioning...');
-    await provisionCluster(formData, DEV_LOCAL_REPO_DIR);
+    // await provisionCluster(formData, DEV_LOCAL_REPO_DIR);
     console.log('Stage 2: Completed.');
 
     broadcast({ stage: 2, message: 'Stage 2 complete: Provision successful' });
  
-    await stage3SetupJumpbox(DEV_LOCAL_REPO_DIR)
+    // await stage3SetupJumpbox(DEV_LOCAL_REPO_DIR)
     broadcast({ stage: 3, message: 'Stage 3 complete: Jumpbox setup successful' });
+
+    await stage4DomainMapping(formData, DEV_LOCAL_REPO_DIR)
+    broadcast({ stage: 4, message: 'Stage 4 complete: Domain mapping successful' });
+
   } catch (error) {
     res.status(500).json({ message: 'Deployment failed', error: error.toString() });
   }
